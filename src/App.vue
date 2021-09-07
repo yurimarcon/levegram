@@ -2,7 +2,8 @@
   <v-app id="inspire">
 
     <v-navigation-drawer
-      app
+    v-model="drawer"
+    app
     >
       <v-sheet
         color="grey lighten-4"
@@ -31,6 +32,22 @@
     <v-main
     style="background-color: rgba(0,0,0,.1)"
     >
+
+      <!-- style="margin: 23px 0 0 -13px" -->
+      <v-btn
+        style="margin: 23px 0 0 -13px; z-index: 3000"
+        @click="drawer = !drawer"
+        color="primary"
+        fab
+        dark
+        small
+        absolute
+        top
+        left
+      >
+        <v-icon>mdi-menu</v-icon>
+      </v-btn>
+
       <v-container
         class="py-8 px-6"
         fluid
@@ -41,7 +58,7 @@
           <v-col
             cols="12"
           >
-            <v-subheader>Últimas mensagens</v-subheader>
+            <!-- <v-subheader class="">Últimas mensagens</v-subheader> -->
             
             <v-card
             style="height: 500px"
@@ -59,8 +76,8 @@
                 max-height="100%"
                 >
                   <v-alert
-                  v-for="mensagem in mensagens"
-                  :key="mensagem.dataDeEnvio"
+                  v-for="mensagem, index in mensagens"
+                  :key="index"
                   :border="'left'"
                   :color="mensagem.enviada? 'deep-purple accent-4' : 'success'"
                   colored-border
@@ -102,7 +119,8 @@
               name="input-7-4"
               label="Mensagem que será enviada"
               v-model="conteudoMensagem"
-              @keyup.right="enviarMsg()"
+              @keyup.prevent.page-up="enviarMsg()"
+              autofocus
             ></v-textarea>
 
           </v-col>
@@ -115,6 +133,7 @@
 <script>
   export default {
     data: () => ({
+      drawer: true,
       conteudoMensagem:"",
       mensagens:[{
         enviada: false,
@@ -125,35 +144,46 @@
     }),
     methods:{
       enviarMsg(){
-        let mensagem = {
-            enviada: true,
-            remetente: 'Você',
-            dataDeEnvio: new Date(),
-            conteudo: this.conteudoMensagem
+
+        if(this.conteudoMensagem){
+          let mensagem = {
+              enviada: true,
+              remetente: 'Você',
+              dataDeEnvio: new Date(),
+              conteudo: this.conteudoMensagem
+          }
+  
+          this.mensagens.unshift(mensagem);
+          this.conteudoMensagem = null;
+
+          let idChat = '1065645850';
+          let token = '1919090353:AAGhlahsRIYGtesWLYH-KB0Wzj6p2fZ3MUs';
+          const target = "https://api.telegram.org/bot" + token + "/sendMessage?chat_id=" + idChat + "&text=" + mensagem.conteudo;
+          console.log(target);
+          // axios.get(target);
+          
+          try{
+              fetch(target)
+              .then((r)=>r.json()).then((res)=>res)
+          }catch(e){
+              console.log(e)
+          }
         }
 
-        this.mensagens.unshift(mensagem);
-        this.conteudoMensagem = null;
 
-        try{
-            fetch('https://api-monitoramento-telegram.herokuapp.com/sendMsg',{
-                method:'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    "title":"Mensagem Pai",
-                    "text": mensagem.conteudo
-                })
-            }).then((r)=>r.json()).then((res)=>res)
-        }catch(e){
-            console.log(e)
-        }
-
-      }
+      },
     },
+    created(){
+    }
   }
 </script>
 
 <style scoped>
+#inspire{
+  max-width: 100%;
+  height: 50%;
+}
+
 .texto{
   text-align: end !important;
   min-width: 100% !important;
