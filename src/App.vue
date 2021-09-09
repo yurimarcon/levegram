@@ -122,11 +122,12 @@
             <v-textarea
               solo
               outlined
-              name="input-7-4"
+              name="input-textarea"
               label="Mensagem que será enviada"
               v-model="conteudoMensagem"
               @keyup.prevent.page-up="enviarMsg()"
               autofocus
+              class=" text-h4"
             ></v-textarea>
 
           </v-col>
@@ -185,7 +186,7 @@
                 this.mensagens.unshift({
                   enviada: false,
                   remetente: hit.message.from.first_name,
-                  dataDeEnvio: new Date(hit.message.date),
+                  dataDeEnvio: new Date(parseInt(hit.message.date + "000")),
                   conteudo: hit.message.text
                 })
               }
