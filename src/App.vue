@@ -205,7 +205,7 @@
         await this.sleep(30000)
         this.buscaUpdates()
         n++
-      }while(n < 0)
+      }while(n < 2000)
       window.location.href = "."
     },
   }
