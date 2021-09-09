@@ -24,7 +24,11 @@ npm run lint
 See [Configuration Reference](https://cli.vuejs.org/config/).
 
 Para chamar a API para buscar as conversas:
-https://api.telegram.org/bot + token +/getupdates
+~~~javascript
+const target = "https://api.telegram.org/bot" + token +"/getupdates";
+~~~
 
-Para chamar a API para buscar as conversas:
+Para chamar a API para enviar mensagem:
+~~~javascript
 const target = "https://api.telegram.org/bot" + token + "/sendMessage?chat_id=" + idChat + "&text=" + mensagem;
+~~~~

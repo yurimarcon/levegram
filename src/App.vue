@@ -6,17 +6,21 @@
     app
     >
       <v-sheet
-        color="grey lighten-4"
+        class="py-4 d-flex justify-center"
       >
         <!-- class="pa-4" -->
+        <v-avatar
+        
+        size="200"
+        >
           <v-img
             :src="$store.state.contato.foto"
             alt="John"
-          >
-          </v-img>
+          ></v-img>
+
+        </v-avatar>
 
       </v-sheet>
-
       <v-divider></v-divider>
         
         <div
@@ -26,8 +30,9 @@
         </div>
 
       <v-divider></v-divider>
-
     </v-navigation-drawer>
+
+
 
     <v-main
     style="background-color: rgba(0,0,0,.1)"
@@ -65,13 +70,14 @@
             >
             <!-- color="indigo lighten-4" -->
               <v-img
+
               aspect-ratio="1.4"
               max-height="100%"
               src="https://ajcanjusao.cloudimg.io/v7/https://blog.1a23.com/wp-content/uploads/sites/2/2020/02/Desktop.png?w=1024&h=576&org_if_sml=1"
               >
 
                 <v-responsive
-                class="overflow-y-auto pt-4"
+                class="overflow-y-auto pt-4 scroll-container"
                 spellcheck="0"
                 max-height="100%"
                 >
@@ -83,8 +89,8 @@
                   colored-border
                   elevation="2"
                   class="mx-3"
-                  width="700"
                   >
+                  <!-- width="700" -->
                     <div
                     class="d-flex font-weight-black"
                     >
@@ -159,22 +165,49 @@
           let idChat = '1065645850';
           let token = '1919090353:AAGhlahsRIYGtesWLYH-KB0Wzj6p2fZ3MUs';
           const target = "https://api.telegram.org/bot" + token + "/sendMessage?chat_id=" + idChat + "&text=" + mensagem.conteudo;
-          console.log(target);
-          // axios.get(target);
           
           try{
-              fetch(target)
+            fetch(target)
               .then((r)=>r.json()).then((res)=>res)
           }catch(e){
-              console.log(e)
+            console.log(e)
           }
         }
-
-
       },
+      buscaUpdates(){
+        fetch("https://api.telegram.org/bot1919090353:AAGhlahsRIYGtesWLYH-KB0Wzj6p2fZ3MUs/getupdates")
+          .then((r)=>r.json()).then((res)=>{
+            res.result.forEach(hit => {
+              
+              if(!this.mensagens.filter(msg => msg.conteudo == hit.message.text)[0]){ // Verifica se a mensagem buscada já existe
+                
+                // se a mensagem não existir coloca ela na tela
+                this.mensagens.unshift({
+                  enviada: false,
+                  remetente: hit.message.from.first_name,
+                  dataDeEnvio: new Date(hit.message.date),
+                  conteudo: hit.message.text
+                })
+              }
+
+            });
+            // console.log(res)
+        });
+      },
+      sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+      }
     },
-    created(){
-    }
+    async created(){
+      this.buscaUpdates()
+      let n = 0;
+      do{
+        await this.sleep(30000)
+        this.buscaUpdates()
+        n++
+      }while(n < 0)
+      window.location.href = "."
+    },
   }
 </script>
 
@@ -189,4 +222,26 @@
   min-width: 100% !important;
   border: 1px solid black;
 }
+
+.scroll-container{
+  overflow-y: scroll;
+  height:90vh;
+}
+::-webkit-scrollbar {
+	width: 10px;
+	height: 10px;
+}
+::-webkit-scrollbar-button:start:decrement,
+::-webkit-scrollbar-button:end:increment  {
+	display: none;
+}
+::-webkit-scrollbar-track-piece  {
+	background-color: #474747;
+	-webkit-border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:vertical {
+	background-color: rgb(116, 116, 116);
+	-webkit-border-radius: 3px;
+}
+
 </style>
